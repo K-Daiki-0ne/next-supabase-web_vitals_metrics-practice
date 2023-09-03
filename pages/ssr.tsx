@@ -1,18 +1,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { NextPage } from 'next';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { Layout } from '../components/Layout';
 import { supabase } from '../utils/supabase';
 import { Task, Notice } from '../types/types';
 
-type StaticProps = {
+type ServerSideProps = {
   tasks: Task[]
   notices: Notice[]
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  console.log('GetStaticProps ...RUN');
+export const getServerSideProps: GetServerSideProps = async () => {
+  console.log('GetServerSideProps ...RUN');
 
   const { data: tasks } = await supabase
     .from('todos')
@@ -24,16 +24,14 @@ export const getStaticProps: GetStaticProps = async () => {
     .select('*')
     .order('created_at', { ascending: true })
   
-  console.log('GetStaticProps ...OK')  
+  console.log('GetServerSideProps ...OK')  
   return { props: { tasks, notices } }
 }
 
-const Ssg: NextPage<StaticProps> = ({ tasks, notices }) => {
-  
+const Ssr: NextPage<ServerSideProps> = ({ tasks, notices }) => {
   return (
-    <Layout title='SSG'>
-      <p className='mb-3 text-blue-500'>SSG</p>
-    
+    <Layout title='SSR'>
+      <p className='mb-3 text-pink-500'>SSR</p>
       <ul className='mb-3'>
         {tasks.map((task) => {
           return (
@@ -53,16 +51,15 @@ const Ssg: NextPage<StaticProps> = ({ tasks, notices }) => {
           )
         })}
       </ul>
-      <Link href='/ssr' prefetch={false}>
-        <p className='my-3 text-xs'>Link to ssr</p>
+      <Link href='/ssg' prefetch={false}>
+        <p className='my-3 text-xs'>Link to ssg</p>
       </Link>
 
       <Link href='/isr' prefetch={false}>
         <p className='my-3 text-xs'>Link to isr</p>
       </Link>
-
     </Layout>
   )
 }
 
-export default Ssg;
+export default Ssr;
